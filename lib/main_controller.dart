@@ -70,11 +70,12 @@ class MainController extends GetxController {
       modelProgressMessage.trigger('Downloading...\n${uri}');
       var res = await (await HttpClient().getUrl(uri)).close();
       modelProgress.trigger(0.5);
-      modelProgressMessage.trigger('Extracting...');
       var zipFile = File("${tmpDir.path}/downloaded.zip");
       await res.pipe(zipFile.openWrite());
+      modelProgressMessage.trigger('Extracting...');
       await ZipFile.extractToDirectory(
-          zipFile: zipFile, destinationDir: modelsDir);
+          zipFile: zipFile, destinationDir: modelsDir
+      );
       modelProgress.trigger(0.8);
       modelProgressMessage.trigger('Initing...');
       var folderName = uri.pathSegments.last.replaceAll(".zip", "");
