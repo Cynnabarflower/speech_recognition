@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "16186698006",
+    "project_id": "speech-recognition-b48d2",
+    "storage_bucket": "speech-recognition-b48d2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:16186698006:android:b5486522f3bfdaa742c837",
+        "android_client_info": {
+          "package_name": "com.cinnabarflower.speech_recognition"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "16186698006-ck963ah542vb89lasu7svqtotk10q34c.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cinnabarflower.speech_recognition",
+            "certificate_hash": "e3073a42f5566cad96328f98d4bbd676fd80c91a"
+          }
+        },
+        {
+          "client_id": "16186698006-fpgl5uuu40esofc67qsd8drpdq7b5566.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCM76Yr_IIrooyj8RSGtotyai6VIIsfRvg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "16186698006-fpgl5uuu40esofc67qsd8drpdq7b5566.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
