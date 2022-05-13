@@ -125,155 +125,207 @@ class MainView extends GetView<MainController> {
                 ],
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(left: 20.0, right: 20.0),
-              child: Container(
-                height: 60,
-                child: SingleChildScrollView(
-                    reverse: true,
-                    child: Obx(() => Text(controller.currentInput.value))),
-              ),
-            ),
             SizedBox(
-              height: 32,
-              child: Obx(
-                () => ListView(
-                  controller: controller.usersListController,
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    IconButton(
-                        onPressed: () {
-                          controller.currentUser = controller.addUser();
-                          controller.users.refresh();
-                          controller.usersListController.animateTo(controller.usersListController.position.maxScrollExtent, duration: Duration(milliseconds: 100), curve: Curves.bounceOut);
-                        },
-                        icon: const Icon(Icons.person_add)),
-                    IconButton(
-                        onPressed: () {
-                          controller.currentUser = null;
-                          controller.users.refresh();
-                        },
-                        icon: Icon(
-                          Icons.person_search,
-                          color: controller.currentUser == null
-                              ? Colors.redAccent[100]
-                              : null,
-                        )),
-                    ...controller.users.keys.map((e) => DragTarget(
-                      onWillAccept: (data) => data != e,
-                      onAccept: (o) {
-                        if (controller.users.containsKey(o)) {
-                          var anotherUser = controller.users[o]!;
-                          controller.users[e]!.vectors.addAll(anotherUser.vectors);
-                          controller.users.remove(o);
-                        }
-                      },
-                      builder: (context, candidateData, rejectedData) =>
-                       Draggable(
-                         data: e,
-                        feedback: Card(
-                          child: Container(
-                            height: 32,
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                                color: controller.currentUser == e
-                                    ? Colors.redAccent[100]
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(4.0)
-                            ),
-                            margin: EdgeInsets.only(right: 4.0),
-                            padding: EdgeInsets.all(8.0),
-                            child: Text(e),
-                          ),
-                        ),
-                        child: GestureDetector(
-                              onTap: () {
-                                controller.currentUser = e;
-                                controller.users.refresh();
-                              },
-                          onLongPress: () {
-                                showDialog(context: context, builder: (c) {
-                                  var name = e;
-                                  Color color = controller.users[e]!.color;
-                                return Center(
-                                  child: Column(
-                                    mainAxisSize: MainAxisSize.min,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(8),
-                                          color: Colors.white,
-                                        ),
-                                        width: 300,
-                                        padding: EdgeInsets.all(8.0),
-                                        alignment: Alignment.center,
-                                        child: Column(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Material(
-                                              child: TextField(
-                                                controller: TextEditingController()..text = name,
-                                                onChanged: (v) {
-                                                  name = v;
+              height: 60 + 32,
+              child: Stack(
+                children: [
+                  Align(
+                    alignment: Alignment.topCenter,
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 20.0, right: 20.0),
+                      child: Container(
+                        height: 60,
+                        child: SingleChildScrollView(
+                            reverse: true,
+                            child: Obx(() => Text(controller.currentInput.value))),
+                      ),
+                    ),
+                  ),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                      alignment: Alignment.bottomCenter,
+                      child: SizedBox(
+                        height: 32 + 30,
+                        child: Obx(
+                              () => ListView(
+                            controller: controller.usersListController,
+                            scrollDirection: Axis.horizontal,
+                            children: [
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    height: 10,
+                                    width: 20,
+                                    color: Colors.white.withOpacity(0.01),
+                                  ),
+                                  IconButton(
+                                      onPressed: () {
+                                        controller.currentUser = controller.addUser();
+                                        controller.users.refresh();
+                                        controller.usersListController.animateTo(controller.usersListController.position.maxScrollExtent, duration: Duration(milliseconds: 100), curve: Curves.bounceOut);
+                                      },
+                                      icon: const Icon(Icons.person_add)),
+                                ],
+                              ),
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Container(
+                                    height: 10,
+                                    width: 20,
+                                    color: Colors.white.withOpacity(0.01),
+                                  ),
+                                  IconButton(
+                                      onPressed: () {
+                                        controller.currentUser = null;
+                                        controller.users.refresh();
+                                      },
+                                      icon: Icon(
+                                        Icons.person_search,
+                                        color: controller.currentUser == null
+                                            ? Colors.redAccent[100]
+                                            : null,
+                                      )),
+                                ],
+                              ),
+                              ...controller.users.keys.map((e) => Container(
+                                padding: EdgeInsets.only(right: 4.0),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      height: 20,
+                                      width: 20,
+                                      color: Colors.white.withOpacity(0.01),
+                                    ),
+                                    SizedBox(
+                                      height: 30,
+                                      child: DragTarget(
+                                        onWillAccept: (data) => data != e,
+                                        onAccept: (o) {
+                                          if (controller.users.containsKey(o)) {
+                                            var anotherUser = controller.users[o]!;
+                                            controller.users[e]!.vectors.addAll(anotherUser.vectors);
+                                            controller.users.remove(o);
+                                          }
+                                        },
+                                        builder: (context, candidateData, rejectedData) =>
+                                            Draggable(
+                                              data: e,
+                                              feedback: Card(
+                                                child: Container(
+                                                  height: 32,
+                                                  alignment: Alignment.center,
+                                                  decoration: BoxDecoration(
+                                                      color: controller.currentUser == e
+                                                          ? Colors.redAccent[100]
+                                                          : Colors.transparent,
+                                                      borderRadius: BorderRadius.circular(4.0)
+                                                  ),
+                                                  margin: EdgeInsets.only(right: 1.0),
+                                                  padding: EdgeInsets.all(8.0),
+                                                  child: Text(e),
+                                                ),
+                                              ),
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  controller.currentUser = e;
+                                                  controller.users.refresh();
                                                 },
+                                                onLongPress: () {
+                                                  showDialog(context: context, builder: (c) {
+                                                    var name = e;
+                                                    Color color = controller.users[e]!.color;
+                                                    return Center(
+                                                      child: Column(
+                                                        mainAxisSize: MainAxisSize.min,
+                                                        mainAxisAlignment: MainAxisAlignment.center,
+                                                        children: [
+                                                          Container(
+                                                            decoration: BoxDecoration(
+                                                              borderRadius: BorderRadius.circular(8),
+                                                              color: Colors.white,
+                                                            ),
+                                                            width: 300,
+                                                            padding: EdgeInsets.all(8.0),
+                                                            alignment: Alignment.center,
+                                                            child: Column(
+                                                              mainAxisSize: MainAxisSize.min,
+                                                              children: [
+                                                                Material(
+                                                                  child: TextField(
+                                                                    controller: TextEditingController()..text = name,
+                                                                    onChanged: (v) {
+                                                                      name = v;
+                                                                    },
+                                                                  ),
+                                                                ),
+                                                                SizedBox(height: 12.0),
+                                                                ColorPicker(
+                                                                  onColorChanged: (v){
+                                                                    color = v;
+                                                                  },
+                                                                ),
+                                                                Row(
+                                                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                                  children: [
+                                                                    MaterialButton(onPressed: (){
+                                                                      controller.users[e]!.color = color;
+                                                                      if (name != e) {
+                                                                        if (controller.currentUser == e) {
+                                                                          controller.currentUser = name;
+                                                                        }
+                                                                        controller.users[name] =
+                                                                        controller.users[e]!;
+                                                                        controller.users[name]!.name =
+                                                                            name;
+                                                                        controller.users.remove(e);
+                                                                      }
+                                                                      Get.back();
+                                                                    }, child: Icon(Icons.done),),
+                                                                    SizedBox(width: 32,),
+                                                                    MaterialButton(onPressed: (){
+                                                                      controller.users.remove(e);
+                                                                      Get.back();
+                                                                    }, child: Icon(Icons.delete),)
+                                                                  ],
+                                                                )
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    );
+                                                  });
+                                                },
+                                                child: Container(
+                                                  alignment: Alignment.center,
+                                                  decoration: BoxDecoration(
+                                                      color: controller.currentUser == e
+                                                          ? Colors.redAccent[100]
+                                                          : Colors.transparent,
+                                                      borderRadius: BorderRadius.circular(4.0)
+                                                  ),
+                                                  margin: EdgeInsets.only(right: 4.0),
+                                                  padding: EdgeInsets.all(8.0),
+                                                  child: Text(e, style: TextStyle(color: controller.users[e]?.color),),
+                                                ),
                                               ),
                                             ),
-                                            SizedBox(height: 12.0),
-                                            ColorPicker(
-                                              onColorChanged: (v){
-                                              color = v;
-                                            },
-                                            ),
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                              children: [
-                                                MaterialButton(onPressed: (){
-                                                  controller.users[e]!.color = color;
-                                                  if (name != e) {
-                                                    if (controller.currentUser == e) {
-                                                      controller.currentUser = name;
-                                                    }
-                                                    controller.users[name] =
-                                                    controller.users[e]!;
-                                                    controller.users[name]!.name =
-                                                        name;
-                                                    controller.users.remove(e);
-                                                  }
-                                                  Get.back();
-                                                  }, child: Icon(Icons.done),),
-                                                SizedBox(width: 32,),
-                                                MaterialButton(onPressed: (){
-                                                  controller.users.remove(e);
-                                                  Get.back();
-                                                }, child: Icon(Icons.delete),)
-                                              ],
-                                            )
-                                          ],
-                                        ),
                                       ),
-                                    ],
-                                  ),
-                                );
-                                });
-                          },
-                              child: Container(
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  color: controller.currentUser == e
-                                      ? Colors.redAccent[100]
-                                      : Colors.transparent,
-                                  borderRadius: BorderRadius.circular(4.0)
+                                    ),
+                                  ],
                                 ),
-                                margin: EdgeInsets.only(right: 4.0),
-                                padding: EdgeInsets.all(8.0),
-                                child: Text(e, style: TextStyle(color: controller.users[e]?.color),),
-                              ),
-                            ),
+                              ))
+                            ],
+                          ),
+                        ),
                       ),
-                    ))
-                  ],
-                ),
+                    ),
+                  ),
+                ],
               ),
             ),
             Padding(
@@ -430,7 +482,11 @@ class MainView extends GetView<MainController> {
                   )),
               IconButton(
                   onPressed: () {
-                    controller.addToDrive();
+                    if (controller.googleUser.value != null) {
+                      controller.addToDrive();
+                    } else {
+                      Get.snackbar('Ooops', 'Надо войти в аккаунт', snackPosition: SnackPosition.BOTTOM);
+                    }
                   },
                   icon: const Icon(
                     Icons.add_to_drive,
@@ -618,54 +674,86 @@ class MainView extends GetView<MainController> {
                                 context: Get.context!,
                                 builder: (context) {
                                   return Center(
-                                    child: StreamBuilder(
-                                      stream:
-                                          File(e.path).readAsLines().asStream(),
-                                      builder: (context,
-                                          AsyncSnapshot<List<String>> snapshot) {
-                                        if (!snapshot.hasData ||
-                                            snapshot.data == null) {
-                                          return Material(
-                                            child: Container(
-                                              height: MediaQuery.of(context)
-                                                      .size
-                                                      .height *
-                                                  0.8,
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.9,
-                                              alignment: Alignment.center,
-                                              child:
-                                                  const CircularProgressIndicator(),
-                                            ),
-                                          );
-                                        }
-                                        return Material(
-                                          child: Container(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.8,
-                                            width: MediaQuery.of(context)
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(12),
+                                      child: Column(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          if (File(e.path.replaceAll('.txt', '.wav')).existsSync()) Padding(
+                                            padding: const EdgeInsets.only(bottom: 2.0),
+                                            child: Material(
+                                              child: Container(
+                                                width: MediaQuery.of(context)
                                                     .size
                                                     .width *
-                                                0.9,
-                                            alignment: Alignment.topLeft,
-                                            padding: const EdgeInsets.all(4.0),
-                                            child: ListView.builder(
-                                              itemCount: snapshot.data!.length,
-                                              itemBuilder: (context, index) =>
-                                                  ListTile(
-                                                visualDensity:
-                                                    VisualDensity.compact,
-                                                title:
-                                                    Text(snapshot.data![index]),
+                                                    0.9,
+                                                child: IconButton(icon: Icon(Icons.play_arrow), onPressed: () {
+                                                  OpenFile.open(e.path.replaceAll('.txt', '.wav'));
+                                                }),
                                               ),
                                             ),
                                           ),
-                                        );
-                                      },
+                                          StreamBuilder(
+                                            stream:
+                                                File(e.path).readAsLines().asStream(),
+                                            builder: (context,
+                                                AsyncSnapshot<List<String>> snapshot) {
+                                              if (!snapshot.hasData ||
+                                                  snapshot.data == null) {
+                                                return Material(
+                                                  child: Container(
+                                                    width: MediaQuery.of(context)
+                                                            .size
+                                                            .width *
+                                                        0.9,
+                                                    alignment: Alignment.center,
+                                                    child:
+                                                        const CircularProgressIndicator(),
+                                                  ),
+                                                );
+                                              }
+                                              return Material(
+                                                child: Container(
+                                                  height: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.6,
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.9,
+                                                  alignment: Alignment.topLeft,
+                                                  padding: const EdgeInsets.all(4.0),
+                                                  child: ListView.builder(
+                                                    itemCount: snapshot.data!.length,
+                                                    itemBuilder: (context, index) =>
+                                                        ListTile(
+                                                      visualDensity:
+                                                          VisualDensity.compact,
+                                                      title:
+                                                          Text(snapshot.data![index]),
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 2.0),
+                                            child: Material(
+                                              child: Container(
+                                                width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                    0.9,
+                                                child: IconButton(icon: Icon(Icons.done), onPressed: () {
+                                                  Get.back();
+                                                }),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   );
                                 },

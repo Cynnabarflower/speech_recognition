@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:audio_streamer/audio_streamer.dart';
 import 'package:file_picker/file_picker.dart';
@@ -196,7 +197,23 @@ class MainController extends GetxController {
   Future saveToFile(text, List<double> rec) async {
     var now = DateTime.now();
     print('saving: $text');
+    var intRec = rec.map((element) => (element * 32767).round().toUnsigned(16)).expand((element) => [element & 0xff, (element >> 8) & 0xff]).toList();
+    FlutterSoundPlayer player = FlutterSoundPlayer();
+    player.openAudioSession();
+    // print('playing.. ${intRec.length}');
+    // player.startPlayer(
+    //     numChannels: 1,
+    //     codec: Codec.pcm16,
+    //     sampleRate: 44100,
+    //     fromDataBuffer: Uint8List.fromList(intRec),
+    //     whenFinished: () {
+    //       print('donw playing');
+    // }
+    // );
+    var waveBuffer = await flutterSoundHelper.pcmToWaveBuffer(inputBuffer: Uint8List.fromList(intRec), numChannels: 1, sampleRate: 44100);
     var path = (await getApplicationDocumentsDirectory()).path;
+    var wavFile = File('$path/recordings/${now.toString()}.wav')..createSync(recursive: true);
+    wavFile.writeAsBytesSync(waveBuffer);
     var f = File('$path/recordings/${now.toString()}.txt')..createSync(recursive: true);
     f.writeAsString(text);
     await loadFiles();
@@ -205,7 +222,7 @@ class MainController extends GetxController {
   Future loadFiles() async {
     var directory = (await getApplicationDocumentsDirectory()).path;
     files.assignAll(
-        (Directory("$directory/recordings")..createSync()).listSync()
+        (Directory("$directory/recordings")..createSync()).listSync().where((element) => element.path.endsWith('.txt'))
     );
     // var filenames = await firebaseProvider?.getFilenames() ?? [];
     // setState(() {
@@ -296,7 +313,7 @@ class MainController extends GetxController {
     var cacheDir = (await getExternalCacheDirectories())!.first;
     var modelsDir = await Directory("${cacheDir.path}/vosk_models").create();
     var smallModel = modelsDir.listSync().where((element) => element.path.contains('small'));
-    var bigModel = modelsDir.listSync().where((element) => !element.path.contains('small'));
+    var bigModel = modelsDir.listSync().where((element) => !element.path.contains('big'));
     if (modelVariant.isSmall && smallModel.isNotEmpty) {
       return smallModel.first.path;
     } else if (modelVariant.isBig && bigModel.isNotEmpty) {
@@ -608,10 +625,55 @@ class MainController extends GetxController {
   Future<void> addToDrive() async {
     String plainText = qcontroller.value.document.toPlainText();
     docs.Document document = docs.Document();
-    document.addText(plainText, TextStyle(fontWeight: FontWeight.bold));
-    document.title = plainText.substring(0, max(plainText.length, 20));
-    var doc = await Get.find<DocsController>().saveDoc(document, text: qcontroller.value.document.toPlainText());
-    print('Saved: ${doc}');
+    document.title = plainText.split('\n').first;
+    var docsController = Get.find<DocsController>();
+    var doc = await docsController.createDoc(document, text: qcontroller.value.document.toPlainText());
+    docsController.updateDoc(doc.documentId!, plainText, TextStyle(), 1, plainText.length);
+    var docId = doc.documentId;
+    // var styles = qcontroller.value.document.collectAllIndividualStyles(0, qcontroller.value.document.length);
+    // print(styles);
+    // if (styles.isNotEmpty) {
+    //   if (styles.first.item1 > 1) {
+    //     docId = await docsController.updateDoc(doc.documentId!, plainText.substring(0, styles.first.item1), TextStyle(), 0, styles.first.item1);
+    //   }
+    //   for (int i = 0; i < styles.length - 1; i++) {
+    //     try {
+    //       docId = await docsController.updateDoc(
+    //           docId!,
+    //           plainText.substring(styles[i].item1, styles[i + 1].item1),
+    //           TextStyle(
+    //             fontWeight: (styles[i].item2.attributes['bold']?.value ?? false)
+    //                 ? FontWeight.bold
+    //                 : FontWeight.normal,
+    //             color: mat.Color(int.parse(
+    //                 (styles[i].item2.attributes['color']?.value as String?)
+    //                     ?.replaceAll('#', '0xff') ?? '0xff000000')),
+    //           ),
+    //           styles[i].item1 + 1, styles[i + 1].item1
+    //       );
+    //     } catch (_) {
+    //
+    //     }
+    //   }
+    //   int to = plainText.length;
+    //     try {
+    //       await docsController.updateDoc(
+    //           docId!,
+    //           plainText.substring(styles.last.item1), TextStyle(
+    //         fontWeight: styles.last.item2.attributes.containsKey('bold')
+    //             ? FontWeight.bold
+    //             : FontWeight.normal,
+    //         color: mat.Color(int.parse(
+    //             (styles.last.item2.attributes['color']?.value as String?)
+    //                 ?.replaceAll('#', '0xff') ?? '0xff000000')),
+    //       ),
+    //           styles.last.item1 + 1,
+    //           to
+    //       );
+    //     } catch (_) {}
+    // } else {
+    //   await docsController.updateDoc(docId!, plainText, TextStyle(), 0, plainText.length);
+    // }
   }
 
   /// Runs inference in another isolate

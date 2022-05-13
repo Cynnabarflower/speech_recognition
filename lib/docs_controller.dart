@@ -37,19 +37,45 @@ class DocsController extends GetxController {
 
 
 
-  Future<docsApi.Document> saveDoc(docsApi.Document docModel, {String text = ''}) async{
+  Future<docsApi.Document> createDoc(docsApi.Document docModel, {String text = ''}) async{
     var doc = await docsApi.DocsApi(MyClient()).documents.create(docModel);
-    await docsApi.DocsApi(MyClient()).documents
-        .batchUpdate(docsApi.BatchUpdateDocumentRequest(
-      requests: [docsApi.Request(
-        insertText: docsApi.InsertTextRequest(
-          text: text,
-          location: docsApi.Location(index: 1),
-        )
-      )],
-      writeControl: docsApi.WriteControl()
-    ), doc.documentId!);
     return doc;
+  }
+
+  Future<String?> updateDoc(String documentId, String text, TextStyle style, int start, int finish) async {
+    print('updating doc...');
+    return (await docsApi.DocsApi(MyClient()).documents
+        .batchUpdate(docsApi.BatchUpdateDocumentRequest(
+        requests: [docsApi.Request(
+          insertText: docsApi.InsertTextRequest(
+            text: text,
+            location: docsApi.Location(index: start),
+          ),
+        ),
+          // docsApi.Request(
+          //     updateTextStyle: docsApi.UpdateTextStyleRequest(
+          //         textStyle: docsApi.TextStyle(
+          //           bold: true,
+          //           foregroundColor: docsApi.OptionalColor(
+          //             color: docsApi.Color(
+          //               rgbColor: docsApi.RgbColor(
+          //                 red: (style.color?.red ?? 0) / 255.0,
+          //                 green: (style.color?.green ?? 0) / 255.0,
+          //                 blue: (style.color?.blue ?? 0) / 255.0,
+          //               )
+          //             )
+          //           )
+          //         ),
+          //         fields: '*',
+          //         range: docsApi.Range(
+          //           startIndex: start,
+          //           endIndex: finish,
+          //         )
+          //     )
+          // )
+        ],
+        writeControl: docsApi.WriteControl()
+    ), documentId)).documentId;
   }
 
 }
